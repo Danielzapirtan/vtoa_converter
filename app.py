@@ -1,5 +1,5 @@
 from flask import Flask, request, send_file
-from moviepy.editor import VideoFileClip
+from moviepy import VideoFileClip
 
 app = Flask(__name__)
 
