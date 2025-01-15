@@ -28,6 +28,10 @@
             gap: 20px;
             align-items: center;
         }
+        .input-section {
+            width: 100%;
+            max-width: 400px;
+        }
         .file-input {
             border: 2px dashed #ccc;
             padding: 20px;
@@ -35,7 +39,13 @@
             border-radius: 4px;
             cursor: pointer;
             width: 100%;
-            max-width: 400px;
+        }
+        .url-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
         }
         .submit-btn {
             background-color: #4CAF50;
@@ -59,28 +69,50 @@
             color: #666;
             margin-top: 20px;
         }
+        .separator {
+            text-align: center;
+            margin: 20px 0;
+            color: #666;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Video to Audio Converter</h1>
         <form class="upload-form" action="/convert" method="post" enctype="multipart/form-data" onsubmit="showLoading()">
-            <div class="file-input">
-                <input type="file" name="video" accept=".mp4,.avi,.mov,.wmv,.flv" required>
+            <div class="input-section">
+                <div class="file-input">
+                    <input type="file" name="video" accept=".mp4,.avi,.mov,.wmv,.flv">
+                </div>
             </div>
+            
+            <div class="separator">- OR -</div>
+            
+            <div class="input-section">
+                <input type="url" name="video_url" placeholder="Enter video URL" class="url-input">
+            </div>
+            
             <button type="submit" class="submit-btn">Convert to MP3</button>
         </form>
+        
         <div id="loading">
             Converting... Please wait...
         </div>
+        
         <div class="supported-formats">
-            Supported formats: MP4, AVI, MOV, WMV, FLV
+            Supported formats: MP4, AVI, MOV, WMV, FLV<br>
+            Supported platforms: YouTube, Vimeo, and many more
         </div>
     </div>
 
     <script>
         function showLoading() {
-            document.getElementById('loading').style.display = 'block';
+            if (document.querySelector('input[type="file"]').files.length > 0 || 
+                document.querySelector('input[type="url"]').value.trim() !== '') {
+                document.getElementById('loading').style.display = 'block';
+            } else {
+                return false;
+            }
         }
     </script>
 </body>
