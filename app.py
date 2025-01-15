@@ -1,6 +1,6 @@
 from flask import Flask, request, send_file, render_template
 from werkzeug.utils import secure_filename
-from moviepy.editor import VideoFileClip
+from moviepy import VideoFileClip
 from urllib.parse import urlparse
 import yt_dlp
 import os
