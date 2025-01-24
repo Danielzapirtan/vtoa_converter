@@ -162,6 +162,7 @@
             const timerElement = document.getElementById('timer');
             const progressBar = document.getElementById('progress-bar');
             const downloadLink = document.getElementById('download-link');
+            const loadingSpinner = document.querySelector('.loading-spinner');
 
             let startTime;
             let timerInterval;
@@ -215,6 +216,9 @@
                     stopTimer();
                     statusMessage.textContent = 'Conversion complete!';
                     
+                    // Stop spinner
+                    loadingSpinner.style.display = 'none';
+                    
                     // Create download link
                     const url = window.URL.createObjectURL(blob);
                     downloadLink.href = url;
@@ -227,13 +231,15 @@
                     stopTimer();
                     statusMessage.textContent = `Error: ${error.message}`;
                     updateProgressBar(0);
+                    // Stop spinner in case of error too
+                    loadingSpinner.style.display = 'none';
                 })
                 .finally(() => {
                     submitBtn.disabled = false;
                 });
             });
 
-            // Enable submit only if either file or URL is provided
+            // Enable submit if either file or URL is provided
             [fileInput, urlInput].forEach(input => {
                 input.addEventListener('change', function() {
                     submitBtn.disabled = !(fileInput.files.length || urlInput.value.trim());
