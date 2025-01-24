@@ -55,14 +55,56 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
+            transition: background-color 0.3s ease;
         }
         .submit-btn:hover {
             background-color: #45a049;
         }
-        #loading {
+        .submit-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #processing-section {
             display: none;
             text-align: center;
             margin-top: 20px;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0,0,0,0.3);
+            border-radius: 50%;
+            border-top-color: #000;
+            animation: spin 1s ease-in-out infinite;
+            margin: 10px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #progress-bar {
+            width: 0%;
+            height: 5px;
+            background-color: #4CAF50;
+            transition: width 0.5s ease;
+            margin: 10px auto;
+            max-width: 400px;
+        }
+        #status-message {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        #timer {
+            color: #666;
+            margin-top: 10px;
+        }
+        #download-link {
+            display: none;
+            margin-top: 15px;
+            text-decoration: none;
+            color: #4CAF50;
+            font-weight: bold;
         }
         .supported-formats {
             text-align: center;
@@ -79,24 +121,28 @@
 <body>
     <div class="container">
         <h1>Video to Audio Converter</h1>
-        <form class="upload-form" action="/convert" method="post" enctype="multipart/form-data" onsubmit="showLoading()">
+        <form id="conversion-form" class="upload-form" action="/convert" method="post" enctype="multipart/form-data">
             <div class="input-section">
                 <div class="file-input">
-                    <input type="file" name="video" accept=".mp4,.avi,.mov,.wmv,.flv">
+                    <input type="file" id="file-input" name="video" accept=".mp4,.avi,.mov,.wmv,.flv" required>
                 </div>
             </div>
             
             <div class="separator">- OR -</div>
             
             <div class="input-section">
-                <input type="url" name="video_url" placeholder="Enter video URL" class="url-input">
+                <input type="url" id="url-input" name="video_url" placeholder="Enter video URL" class="url-input">
             </div>
             
-            <button type="submit" class="submit-btn">Convert to MP3</button>
+            <button type="submit" id="submit-btn" class="submit-btn">Convert to MP3</button>
         </form>
         
-        <div id="loading">
-            Converting... Please wait...
+        <div id="processing-section">
+            <div class="loading-spinner"></div>
+            <div id="progress-bar"></div>
+            <div id="status-message">Converting video to audio...</div>
+            <div id="timer"></div>
+            <a href="#" id="download-link" download>Download MP3</a>
         </div>
         
         <div class="supported-formats">
@@ -106,14 +152,94 @@
     </div>
 
     <script>
-        function showLoading() {
-            if (document.querySelector('input[type="file"]').files.length > 0 || 
-                document.querySelector('input[type="url"]').value.trim() !== '') {
-                document.getElementById('loading').style.display = 'block';
-            } else {
-                return false;
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('conversion-form');
+            const fileInput = document.getElementById('file-input');
+            const urlInput = document.getElementById('url-input');
+            const submitBtn = document.getElementById('submit-btn');
+            const processingSection = document.getElementById('processing-section');
+            const statusMessage = document.getElementById('status-message');
+            const timerElement = document.getElementById('timer');
+            const progressBar = document.getElementById('progress-bar');
+            const downloadLink = document.getElementById('download-link');
+
+            let startTime;
+            let timerInterval;
+
+            function startTimer() {
+                startTime = Date.now();
+                timerInterval = setInterval(() => {
+                    const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+                    timerElement.textContent = `Conversion time: ${elapsedTime} seconds`;
+                }, 1000);
             }
-        }
+
+            function stopTimer() {
+                clearInterval(timerInterval);
+            }
+
+            function updateProgressBar(percentage) {
+                progressBar.style.width = `${percentage}%`;
+            }
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // Validate input
+                if (!fileInput.files.length && !urlInput.value.trim()) {
+                    alert('Please select a file or enter a video URL');
+                    return;
+                }
+
+                const formData = new FormData(form);
+                
+                // Show processing UI
+                processingSection.style.display = 'block';
+                submitBtn.disabled = true;
+                updateProgressBar(20);
+                startTimer();
+
+                fetch('/convert', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    updateProgressBar(60);
+                    if (!response.ok) {
+                        throw new Error('Conversion failed');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    updateProgressBar(80);
+                    stopTimer();
+                    statusMessage.textContent = 'Conversion complete!';
+                    
+                    // Create download link
+                    const url = window.URL.createObjectURL(blob);
+                    downloadLink.href = url;
+                    downloadLink.textContent = 'Download MP3';
+                    downloadLink.style.display = 'block';
+                    
+                    updateProgressBar(100);
+                })
+                .catch(error => {
+                    stopTimer();
+                    statusMessage.textContent = `Error: ${error.message}`;
+                    updateProgressBar(0);
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                });
+            });
+
+            // Enable submit only if either file or URL is provided
+            [fileInput, urlInput].forEach(input => {
+                input.addEventListener('change', function() {
+                    submitBtn.disabled = !(fileInput.files.length || urlInput.value.trim());
+                });
+            });
+        });
     </script>
 </body>
 </html>
