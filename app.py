@@ -9,7 +9,7 @@ import uuid
 app = Flask(__name__)
 
 # Configure upload folder and allowed extensions
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = '/tmp/uploads'
 ALLOWED_EXTENSIONS = {'mp4', 'avi', 'mov', 'wmv', 'flv'}
 
 if not os.path.exists(UPLOAD_FOLDER):
