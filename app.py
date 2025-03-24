@@ -1,8 +1,9 @@
 import gradio as gr
-from moviepy import VideoFileClip
+from moviepy.editor import VideoFileClip  # Correct import statement
 import yt_dlp
 import os
 import uuid
+from urllib.parse import urlparse  # Added import for urlparse
 
 # Configure upload folder
 UPLOAD_FOLDER = '/tmp/uploads'
@@ -51,6 +52,8 @@ def process_video(video_file, video_url):
     
     try:
         if video_url:
+            if not is_valid_url(video_url):  # Validate URL
+                return "Invalid URL provided"
             video_path = download_video(video_url)
         elif video_file:
             if not allowed_file(video_file.name):
