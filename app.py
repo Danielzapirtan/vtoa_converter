@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 # Configure upload folder and allowed extensions
 UPLOAD_FOLDER = '/tmp/uploads'
-ALLOWED_EXTENSIONS = {'mp4', 'avi', 'mov', 'wmv', 'flv'}
+ALLOWED_EXTENSIONS = {'mp4', "mp4a", 'avi', 'mov', 'wmv', 'flv'}
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
@@ -36,7 +36,7 @@ def download_video(url):
         'format': 'best',  # Download best quality
         'outtmpl': video_path,
         'quiet': True,
-        'no_warnings': True,
+        'no_warnings': False,
     }
     
     try:
@@ -44,7 +44,7 @@ def download_video(url):
             ydl.download([url])
         return video_path
     except Exception as e:
-        raise Exception(f"Error downloading video: {str(e)}")
+        raise Exception(f"Error downloading video: {str(e)} {video_path}")
 
 def convert_to_audio(video_path):
     audio_path = os.path.join(
@@ -111,7 +111,7 @@ def convert_video():
             os.remove(video_path)
         if audio_path and os.path.exists(audio_path):
             os.remove(audio_path)
-        return f'Error: {str(e)}', 500
+        return f'Error: {str(e)} {video_path}', 500
     
     finally:
         # Clean up the audio file after sending
