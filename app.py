@@ -27,7 +27,7 @@ def convert_video_to_audio(video_file, output_format):
         return f"Error: {str(e)}"
 
 # Supported input formats
-input_formats = [".mp4", ".m4a", ".mov", ".avi", ".mkv", ".flv", ".wmv"]
+input_formats = [".mp4", ".mov", ".avi", ".mkv", ".flv", ".wmv"]
 
 # Supported output formats
 output_formats = ["MP3", "WAV", "M4A", "AAC", "OGG"]
