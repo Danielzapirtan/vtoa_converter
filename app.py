@@ -47,18 +47,6 @@ with gr.Blocks() as app:
             audio_output = gr.Audio(label="Converted Audio", type="filepath")
             download_output = gr.File(label="Download Audio File")
     
-    # Examples
-    gr.Examples(
-        examples=[
-            ["examples/sample.mp4", "MP3"],
-            ["examples/sample.m4a", "WAV"]
-        ],
-        inputs=[video_input, output_format],
-        outputs=audio_output,
-        fn=convert_video_to_audio,
-        cache_examples=True
-    )
-    
     convert_btn.click(
         fn=convert_video_to_audio,
         inputs=[video_input, output_format],
