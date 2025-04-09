@@ -1,6 +1,6 @@
 import gradio as gr
 import os
-from moviepy import VideoFileClip
+from moviepy.editor import VideoFileClip
 import tempfile
 
 def convert_video_to_audio(video_file, output_format):
