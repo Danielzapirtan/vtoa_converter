@@ -54,4 +54,4 @@ with gr.Blocks() as app:
     )
 
 if __name__ == "__main__":
-    app.launch(debug=true)
+    app.launch(debug=True)
