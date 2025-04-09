@@ -32,7 +32,11 @@ def convert_video_to_audio(input_source, output_format):
             if isinstance(input_source, str) and input_source.startswith(('http://', 'https://')):
                 video_path = download_url(input_source, temp_dir)
             else:
-                video_path = input_source.name if hasattr(input_source, 'name') else input_source
+                # Handle Gradio file object
+                if hasattr(input_source, 'name'):
+                    video_path = input_source.name
+                else:
+                    video_path = input_source
 
             # Load the video file
             video = VideoFileClip(video_path)
@@ -77,15 +81,22 @@ with gr.Blocks() as app:
     
     def process_inputs(url, file, format):
         # Use file if uploaded, otherwise use URL
-        source = file if file is not None else url
-        if not source:
-            return "Error: Please provide a URL or upload a file"
-        return convert_video_to_audio(source, format)
+        if file is not None:
+            source = file
+        elif url.strip():
+            source = url
+        else:
+            raise gr.Error("Please provide a URL or upload a file")
+            
+        result = convert_video_to_audio(source, format)
+        if result.startswith("Error:"):
+            raise gr.Error(result)
+        return result
 
     convert_btn.click(
         fn=process_inputs,
         inputs=[video_input, file_upload, output_format],
-        outputs=[audio_output]
+        outputs=[audio_output, download_output]
     )
 
 if __name__ == "__main__":
