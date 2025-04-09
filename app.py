@@ -85,7 +85,7 @@ with gr.Blocks() as app:
     convert_btn.click(
         fn=process_inputs,
         inputs=[video_input, file_upload, output_format],
-        outputs=[audio_output, download_output]
+        outputs=[audio_output]
     )
 
 if __name__ == "__main__":
