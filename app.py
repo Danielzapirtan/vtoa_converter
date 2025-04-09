@@ -91,7 +91,7 @@ with gr.Blocks() as app:
         result = convert_video_to_audio(source, format)
         if result.startswith("Error:"):
             raise gr.Error(result)
-        return result
+        return result, result  # Return the same path for both outputs
 
     convert_btn.click(
         fn=process_inputs,
