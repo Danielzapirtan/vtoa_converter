@@ -1,3 +1,3 @@
-gradio
+browser-cookie3
 moviepy
 yt-dlp
